@@ -1,5 +1,15 @@
-import { cn } from "@/lib/utils"
-import { it } from "node:test"
+import { Button } from "@/components/ui/button"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import { Input } from "@/components/ui/input"
 
 const NoiseWall = () => {
   type Texture = { id: number; weight: number; url: string }
@@ -9,9 +19,9 @@ const NoiseWall = () => {
   const nCols: number = 5
 
   const textureList: Texture[] = [
-    { id: 0, weight: 5, url: "Star" },
-    { id: 1, weight: 10, url: "Ball" },
-    { id: 2, weight: 22, url: "Cloud" },
+    { id: 0, weight: 1, url: "Star" },
+    { id: 1, weight: 1, url: "Ball" },
+    { id: 2, weight: 1, url: "Cloud" },
   ]
 
   const wall: Wall = {
@@ -58,13 +68,38 @@ const NoiseWall = () => {
 
   return (
     <div className="grid justify-center p-20 h-screen overflow-scroll bg-slate-700">
-      <main className="flex flex-col items-center bg-orange-500">
-        <div>Odsiggo:3</div>
-
-        <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2">
+      <main className="flex flex-col items-center">
+        <div key="Header" className="p-2 text-2xl bg-orange-500">
+          Odsiggo:3
+        </div>
+        <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2 p-2 bg-orange-300">
           {pirkko.map((item, id) => (
-            <div key={id}>{item}</div>
+            <div key={id} className="w-20 h-20 bg-zinc-800">
+              {item}
+            </div>
           ))}
+        </div>
+        <div className="flex gap-3 p-2 bg-orange-500">
+          <Input type="file"></Input>
+        </div>
+        <div className="p-2 bg-orange-300">
+          <Drawer>
+            <DrawerTrigger>
+              <Button variant="outline">Open Drawer</Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+                <DrawerDescription>This action cannot be undone.</DrawerDescription>
+              </DrawerHeader>
+              <DrawerFooter>
+                <Button>Submit</Button>
+                <DrawerClose>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
         </div>
       </main>
     </div>
