@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Drawer,
@@ -9,7 +11,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { ImagePicker } from "./components/ImagePicker"
+import Dropzone from "./components/Dropzone"
 
 const NoiseWall = () => {
   type Texture = { id: number; weight: number; url: string }
@@ -41,11 +45,11 @@ const NoiseWall = () => {
     return array
   }
 
-  const createArray = (textureList: Texture[], wall: Wall) => {
-    /*Suppose that the test scores are x1,x2,…,x10. Let t be the sum of the test scores;
-  then the first person’s share of the total is x1 / t, the second’s is x2 / t, and so on.
-  These ten fractions add up to 1, so just give person k (for k=1,2,…,10)
-  10000 * xk / t dollars.*/
+  const [images, setImages] = useState<File[]>([])
+  const [bricks, setBricks] = useState<String[]>([])
+
+  const createArray = () => {
+    /* Math based on Weighted Division */
 
     const array: string[] = []
 
@@ -57,14 +61,12 @@ const NoiseWall = () => {
       array.push(...fart)
     })
 
-    return array
+    shuffleArray(array)
+    setBricks(array)
+    console.log(bricks)
   }
 
-  const pirkko: string[] = createArray(textureList, wall)
-
-  shuffleArray(pirkko)
-
-  console.log(pirkko)
+  const handleImage = (image: File[]) => setImages(image)
 
   return (
     <div className="grid justify-center p-20 h-screen overflow-scroll bg-slate-700">
@@ -73,18 +75,24 @@ const NoiseWall = () => {
           Odsiggo:3
         </div>
         <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2 p-2 bg-orange-300">
-          {pirkko.map((item, id) => (
-            <div key={id} className="w-20 h-20 bg-zinc-800">
-              {item}
-            </div>
-          ))}
+          {bricks != undefined
+            ? bricks.map((item, id) => (
+                <div key={id} className="w-20 h-20 bg-zinc-800">
+                  {item}
+                </div>
+              ))
+            : ""}
         </div>
-        <div className="flex gap-3 p-2 bg-orange-500">
-          <Input type="file"></Input>
+        {/*<ImagePicker className="flex flex-col items-center gap-2 bg-orange-500" />*/}
+        <Dropzone></Dropzone>
+        <div className="bg-orange-300 p-2">
+          <Button variant="outline" onClick={() => createArray()}>
+            Create Array
+          </Button>
         </div>
-        <div className="p-2 bg-orange-300">
+        <div className="p-2 bg-orange-500">
           <Drawer>
-            <DrawerTrigger>
+            <DrawerTrigger asChild>
               <Button variant="outline">Open Drawer</Button>
             </DrawerTrigger>
             <DrawerContent>
@@ -94,7 +102,7 @@ const NoiseWall = () => {
               </DrawerHeader>
               <DrawerFooter>
                 <Button>Submit</Button>
-                <DrawerClose>
+                <DrawerClose asChild>
                   <Button variant="outline">Cancel</Button>
                 </DrawerClose>
               </DrawerFooter>
