@@ -1,5 +1,4 @@
 "use client"
-
 import { Button } from "@/components/ui/button"
 import {
   Drawer,
@@ -12,8 +11,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { useState } from "react"
-import { ImagePicker } from "./components/ImagePicker"
-import Dropzone from "./components/Dropzone"
+import DrawerMenu from "./components/DrawerMenu"
 
 const NoiseWall = () => {
   type Texture = { id: number; weight: number; url: string }
@@ -66,52 +64,55 @@ const NoiseWall = () => {
     console.log(bricks)
   }
 
-  const handleImage = (image: File[]) => setImages(image)
-
   return (
     <div className="grid justify-center p-20 h-screen overflow-scroll bg-slate-700">
       <main className="flex flex-col items-center">
-        <div key="Header" className="p-2 text-2xl bg-orange-500">
+        <div key="Header" className="p-2 text-2xl bg-orange-500 mb-6">
           Odsiggo:3
         </div>
-        <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2 p-2 bg-orange-300">
-          {bricks != undefined
-            ? bricks.map((item, id) => (
-                <div key={id} className="w-20 h-20 bg-zinc-800">
-                  {item}
-                </div>
-              ))
-            : ""}
-        </div>
-        {/*<ImagePicker className="flex flex-col items-center gap-2 bg-orange-500" />*/}
-        <Dropzone></Dropzone>
-        <div className="bg-orange-300 p-2">
+
+        <div className="flex flex-col items-center bg-orange-300 p-2 mb-6">
           <Button variant="outline" onClick={() => createArray()}>
             Create Array
           </Button>
-        </div>
-        <div className="p-2 bg-orange-500">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button variant="outline">Open Drawer</Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                <DrawerDescription>This action cannot be undone.</DrawerDescription>
-              </DrawerHeader>
-              <DrawerFooter>
-                <Button>Submit</Button>
-                <DrawerClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+          <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2 p-2 bg-orange-300">
+            {bricks != undefined
+              ? bricks.map((item, id) => (
+                  <div key={id} className="w-20 h-20 bg-zinc-800">
+                    {item}
+                  </div>
+                ))
+              : ""}
+          </div>
         </div>
       </main>
     </div>
   )
 }
+
+/* <Drawer>
+          <DrawerTrigger asChild>
+            <Button variant="outline">Open Drawer</Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className="flex">
+              <div className="grid justify-items-center bg-indigo-950">
+                <DrawerHeader>
+                  <DrawerTitle>Wall Settings</DrawerTitle>
+                  <DrawerDescription>Edit the height and widts of the wall</DrawerDescription>
+                </DrawerHeader>
+              </div>
+              <div className="grid justify-items-center bg-green-950 ">
+                <DrawerHeader>
+                  <DrawerTitle>Tile Settings</DrawerTitle>
+                  <DrawerDescription>
+                    Load tiles and choose their weight value. Higher weight increases their portion of whole.
+                  </DrawerDescription>
+                </DrawerHeader>
+                <DrawerMenu className="flex items-center" />
+              </div>
+            </div>
+          </DrawerContent>
+        </Drawer> */
 
 export default NoiseWall
