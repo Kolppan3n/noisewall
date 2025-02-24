@@ -8,26 +8,23 @@ interface DrawerMenuProps {
 }
 
 const DrawerMenu = ({ className }: DrawerMenuProps) => {
-  const [images, setImages] = useState<string[]>([])
+  const [tiles, settiles] = useState<string[]>([])
 
   const onDrop = useCallback((acceptedFiles: any) => {
     if (acceptedFiles?.length) {
-      setImages((previousImages) => [
-        ...previousImages,
-        ...acceptedFiles.map((file: File) => URL.createObjectURL(file)),
-      ])
+      settiles((previoustiles) => [...previoustiles, ...acceptedFiles.map((file: File) => URL.createObjectURL(file))])
     }
   }, [])
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const handleDelete = (id: number) => {
-    setImages((images) => images.filter((image, index) => index != id))
+    settiles((tiles) => tiles.filter((image, index) => index != id))
   }
 
   return (
     <div className={className}>
       <ul className="flex gap-2 items-center max-w-full h-auto py-8">
-        {images.map((image: string, id: number) => (
+        {tiles.map((image: string, id: number) => (
           <li key={id} className="flex relative w-[120px] h-[120px]">
             <Image className="border-4 rounded-xl" width={120} height={120} src={image} alt="/lario.jpg" />
             <div className="flex absolute -top-8 w-full rounded-xl justify-evenly border-2 px-1">
@@ -54,7 +51,7 @@ const DrawerMenu = ({ className }: DrawerMenuProps) => {
             {isDragActive ? (
               <p className="text-primary font-medium text-center">Drop the files here ...</p>
             ) : (
-              <p className="text-secondary-foreground font-medium text-center">Drop images here or browse files</p>
+              <p className="text-secondary-foreground font-medium text-center">Drop tiles here or browse files</p>
             )}
           </div>
         </li>

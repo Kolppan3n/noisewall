@@ -10,9 +10,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import { useCallback, useState } from "react"
-import Image from "next/image"
-import { useDropzone } from "react-dropzone"
+import { useState } from "react"
+import DrawerMenu from "./components/DrawerMenu"
 
 const NoiseWall = () => {
   type Tile = { weight: number; url: string }
@@ -27,31 +26,11 @@ const NoiseWall = () => {
     { weight: 1, url: "Cloud" },
   ]
 
-  const fart: Tile = { weight: 3, url: "pieru" }
-
-  const [tiles, settiles] = useState<Tile[]>([])
-  const [wall, setWall] = useState<Wall>({
+  const wall: Wall = {
     rows: nRows,
     cols: nCols,
     size: nRows * nCols,
     tiles: tileList,
-  })
-
-  const onDrop = useCallback((acceptedFiles: any) => {
-    if (acceptedFiles?.length) {
-      settiles((previoustiles) => [
-        ...previoustiles,
-        ...acceptedFiles.map((file: File) => {
-          const temp: Tile = { weight: 1, url: URL.createObjectURL(file) }
-        }),
-      ])
-      console.log(tiles)
-    }
-  }, [])
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-
-  const handleDelete = (id: number) => {
-    settiles((tiles) => tiles.filter((image, index) => index != id))
   }
 
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -65,9 +44,10 @@ const NoiseWall = () => {
     return array
   }
 
+  const [tiles, settiles] = useState<File[]>([])
   const [bricks, setBricks] = useState<String[]>([])
 
-  const createWall = () => {
+  const createArray = () => {
     /* Math based on Weighted Division */
 
     const array: string[] = []
@@ -91,8 +71,9 @@ const NoiseWall = () => {
         <div key="Header" className="p-2 text-2xl bg-orange-500 mb-6">
           Odsiggo:3
         </div>
+
         <div className="flex flex-col items-center bg-orange-300 p-2 mb-6">
-          <Button variant="outline" onClick={() => createWall()}>
+          <Button variant="outline" onClick={() => createArray()}>
             Create Array
           </Button>
           <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2 p-2 bg-orange-300">
@@ -124,41 +105,7 @@ const NoiseWall = () => {
                     Load tiles and choose their weight value. Higher weight increases their portion of whole.
                   </DrawerDescription>
                 </DrawerHeader>
-                <ul className="flex gap-2 items-center max-w-full h-auto py-8">
-                  {tiles.map((image: string, id: number) => (
-                    <li key={id} className="flex relative w-[120px] h-[120px]">
-                      <Image className="border-4 rounded-xl" width={120} height={120} src={image} alt="/lario.jpg" />
-                      <div className="flex absolute -top-8 w-full rounded-xl justify-evenly border-2 px-1">
-                        <Button variant="ghost" className="w-1/4 text-center h-6">
-                          -
-                        </Button>
-                        <div className="w-1/2 text-center">5</div>
-                        <Button variant="ghost" className="w-1/4 text-center h-6">
-                          +
-                        </Button>
-                      </div>
-                      <Button
-                        variant="destructive"
-                        className="absolute -bottom-7 left-0 right-0 m-auto rounded-full size-6 -px-1"
-                        onClick={() => handleDelete(id)}
-                      >
-                        X
-                      </Button>
-                    </li>
-                  ))}
-                  <li className="flex justify-center items-center border-4 text-sm border-dashed rounded-xl w-[120px] h-[120px] p-1">
-                    <div {...getRootProps()}>
-                      <input {...getInputProps()} />
-                      {isDragActive ? (
-                        <p className="text-primary font-medium text-center">Drop the files here ...</p>
-                      ) : (
-                        <p className="text-secondary-foreground font-medium text-center">
-                          Drop tiles here or browse files
-                        </p>
-                      )}
-                    </div>
-                  </li>
-                </ul>
+                <DrawerMenu className="flex items-center" />
               </div>
             </div>
           </DrawerContent>
@@ -167,5 +114,7 @@ const NoiseWall = () => {
     </div>
   )
 }
+
+/*  */
 
 export default NoiseWall
