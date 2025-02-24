@@ -27,8 +27,6 @@ const NoiseWall = () => {
     { weight: 1, url: "Cloud" },
   ]
 
-  const fart: Tile = { weight: 3, url: "pieru" }
-
   const [tiles, settiles] = useState<Tile[]>([])
   const [wall, setWall] = useState<Wall>({
     rows: nRows,
@@ -41,17 +39,28 @@ const NoiseWall = () => {
     if (acceptedFiles?.length) {
       settiles((previoustiles) => [
         ...previoustiles,
-        ...acceptedFiles.map((file: File) => {
-          const temp: Tile = { weight: 1, url: URL.createObjectURL(file) }
-        }),
+        ...acceptedFiles.map((file: File) => ({ weight: 1, url: URL.createObjectURL(file) })),
       ])
-      console.log(tiles)
     }
   }, [])
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const handleDelete = (id: number) => {
-    settiles((tiles) => tiles.filter((image, index) => index != id))
+    settiles((tiles) => tiles.filter((tile, index) => index != id))
+  }
+
+  const handleIncrease = (id: number) => {
+    settiles(
+      tiles.map((tile: Tile, index: number) => (index == id ? { weight: tile.weight + 1, url: tile.url } : tile))
+    )
+  }
+
+  const handleDecrease = (id: number) => {
+    settiles(
+      tiles.map((tile: Tile, index: number) =>
+        index == id ? { weight: tile.weight > 0 ? tile.weight - 1 : 0, url: tile.url } : tile
+      )
+    )
   }
 
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -125,15 +134,15 @@ const NoiseWall = () => {
                   </DrawerDescription>
                 </DrawerHeader>
                 <ul className="flex gap-2 items-center max-w-full h-auto py-8">
-                  {tiles.map((image: string, id: number) => (
+                  {tiles.map((tile: Tile, id: number) => (
                     <li key={id} className="flex relative w-[120px] h-[120px]">
-                      <Image className="border-4 rounded-xl" width={120} height={120} src={image} alt="/lario.jpg" />
+                      <Image className="border-4 rounded-xl" width={120} height={120} src={tile.url} alt="/lario.jpg" />
                       <div className="flex absolute -top-8 w-full rounded-xl justify-evenly border-2 px-1">
-                        <Button variant="ghost" className="w-1/4 text-center h-6">
+                        <Button variant="ghost" className="w-1/4 text-center h-6" onClick={() => handleDecrease(id)}>
                           -
                         </Button>
-                        <div className="w-1/2 text-center">5</div>
-                        <Button variant="ghost" className="w-1/4 text-center h-6">
+                        <div className="w-1/2 text-center">{tile.weight}</div>
+                        <Button variant="ghost" className="w-1/4 text-center h-6" onClick={() => handleIncrease(id)}>
                           +
                         </Button>
                       </div>
