@@ -2,10 +2,8 @@
 import { Button } from "@/components/ui/button"
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -13,26 +11,18 @@ import {
 import { useCallback, useState } from "react"
 import Image from "next/image"
 import { useDropzone } from "react-dropzone"
+import { Input } from "@/components/ui/input"
 
 const NoiseWall = () => {
   type Tile = { weight: number; url: string }
-  type Wall = { rows: number; cols: number; size: number; tiles: Tile[] }
-
-  const nRows: number = 3
-  const nCols: number = 5
-
-  const tileList: Tile[] = [
-    { weight: 1, url: "Star" },
-    { weight: 1, url: "Ball" },
-    { weight: 1, url: "Cloud" },
-  ]
+  type Wall = { rows: number; cols: number; size: number; tiles: string[] }
 
   const [tiles, settiles] = useState<Tile[]>([])
   const [wall, setWall] = useState<Wall>({
-    rows: nRows,
-    cols: nCols,
-    size: nRows * nCols,
-    tiles: tileList,
+    rows: 3,
+    cols: 5,
+    size: 3 * 5,
+    tiles: [],
   })
 
   const onDrop = useCallback((acceptedFiles: any) => {
@@ -58,7 +48,7 @@ const NoiseWall = () => {
   const handleDecrease = (id: number) => {
     settiles(
       tiles.map((tile: Tile, index: number) =>
-        index == id ? { weight: tile.weight > 0 ? tile.weight - 1 : 0, url: tile.url } : tile
+        index == id ? { weight: tile.weight > 1 ? tile.weight - 1 : 1, url: tile.url } : tile
       )
     )
   }
@@ -74,69 +64,55 @@ const NoiseWall = () => {
     return array
   }
 
-  const [bricks, setBricks] = useState<String[]>([])
-
   const createWall = () => {
     /* Math based on Weighted Division */
 
-    const array: string[] = []
+    if (tiles != undefined) {
+      const totalWeight = tiles.map((tiles) => tiles.weight).reduce((prev, curr) => prev + curr, 0)
 
-    const totalWeight = tileList.map((tileList) => tileList.weight).reduce((prev, curr) => prev + curr, 0)
+      const temp: string[] = []
 
-    tileList.map((tileList) => {
-      const nTextures = Math.round(wall.size * (tileList.weight / totalWeight))
-      const fart: string[] = new Array(nTextures).fill(tileList.url)
-      array.push(...fart)
-    })
+      tiles.map((tile) => {
+        const nTextures = Math.round(wall.size * (tile.weight / totalWeight))
+        temp.push(...Array(nTextures).fill(tile.url))
+      })
 
-    shuffleArray(array)
-    setBricks(array)
-    console.log(bricks)
+      shuffleArray(temp)
+      setWall({ ...wall, tiles: temp })
+      console.log(wall.tiles)
+    }
   }
 
   return (
     <div className="grid justify-center p-20 h-screen overflow-scroll bg-slate-700">
       <main className="flex flex-col items-center">
-        <div key="Header" className="p-2 text-2xl bg-orange-500 mb-6">
-          Odsiggo:3
-        </div>
-        <div className="flex flex-col items-center bg-orange-300 p-2 mb-6">
-          <Button variant="outline" onClick={() => createWall()}>
-            Create Array
-          </Button>
-          <div key="TheWall" className="grid grid-rows-3 grid-cols-5 gap-2 p-2 bg-orange-300">
-            {bricks != undefined
-              ? bricks.map((item, id) => (
-                  <div key={id} className="w-20 h-20 bg-zinc-800">
-                    {item}
-                  </div>
-                ))
-              : ""}
+        <div className="flex gap-10">
+          <div className="flex items-center gap-2">
+            <p>Number of rows:</p>
+            <Input type="number" placeholder={`${wall.rows}`} className="w-20" />
           </div>
-        </div>
-        <Drawer>
-          <DrawerTrigger asChild>
-            <Button variant="outline">Open Drawer</Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <div className="flex">
-              <div className="grid justify-items-center bg-indigo-950">
-                <DrawerHeader>
-                  <DrawerTitle>Wall Settings</DrawerTitle>
-                  <DrawerDescription>Edit the height and widts of the wall</DrawerDescription>
-                </DrawerHeader>
-              </div>
-              <div className="grid justify-items-center bg-green-950 ">
+          <div className="flex items-center gap-2">
+            <p>Number of columns:</p>
+            <Input type="number" placeholder={`${wall.cols}`} className="w-20" />
+          </div>
+          <Button onClick={() => createWall()}>Generate</Button>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button>Choose Tiles</Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="flex flex-col mx-auto">
                 <DrawerHeader>
                   <DrawerTitle>Tile Settings</DrawerTitle>
                   <DrawerDescription>
-                    Load tiles and choose their weight value. Higher weight increases their portion of whole.
+                    Upload images from your device to be used as tiles. Edit weight values to increase/decrease their
+                    portion.
                   </DrawerDescription>
                 </DrawerHeader>
-                <ul className="flex gap-2 items-center max-w-full h-auto py-8">
+                <ul className="flex flex-wrap gap-2 justify-center h-auto max-w-full">
                   {tiles.map((tile: Tile, id: number) => (
-                    <li key={id} className="flex relative w-[120px] h-[120px]">
-                      <Image className="border-4 rounded-xl" width={120} height={120} src={tile.url} alt="/lario.jpg" />
+                    <li key={id} className="flex relative w-[120px] h-[120px] my-7">
+                      <img className="border-4 rounded-xl object-fill" src={tile.url} alt="/lario.jpg" />
                       <div className="flex absolute -top-8 w-full rounded-xl justify-evenly border-2 px-1">
                         <Button variant="ghost" className="w-1/4 text-center h-6" onClick={() => handleDecrease(id)}>
                           -
@@ -155,23 +131,38 @@ const NoiseWall = () => {
                       </Button>
                     </li>
                   ))}
-                  <li className="flex justify-center items-center border-4 text-sm border-dashed rounded-xl w-[120px] h-[120px] p-1">
+                  <li className="flex justify-center items-center border-4 text-sm border-dashed rounded-xl w-[120px] h-[120px] p-1 my-7">
                     <div {...getRootProps()}>
                       <input {...getInputProps()} />
                       {isDragActive ? (
                         <p className="text-primary font-medium text-center">Drop the files here ...</p>
                       ) : (
                         <p className="text-secondary-foreground font-medium text-center">
-                          Drop tiles here or browse files
+                          Click to browse or drag 'n' drop files here
                         </p>
                       )}
                     </div>
                   </li>
                 </ul>
               </div>
-            </div>
-          </DrawerContent>
-        </Drawer>
+            </DrawerContent>
+          </Drawer>
+        </div>
+
+        <div
+          key="TheWall"
+          className="grid bg-orange-300 m-10"
+          style={{
+            gridTemplateColumns: `repeat(${wall.cols}, 1fr)`,
+            gridTemplateRows: `repeat(${wall.rows}, 1fr)`,
+          }}
+        >
+          {wall.tiles.length > 0
+            ? wall.tiles.map((tile, index) => (
+                <img key={index} className="object-fill h-40 w-40" src={tile} alt="/lario.jpg" />
+              ))
+            : ""}
+        </div>
       </main>
     </div>
   )
